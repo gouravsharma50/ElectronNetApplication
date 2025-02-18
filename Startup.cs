@@ -1,4 +1,4 @@
-using DesktopApplication.Database;
+﻿using DesktopApplication.Database;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -7,7 +7,6 @@ using Microsoft.Extensions.Hosting;
 using ElectronNET.API;
 using ElectronNET.API.Entities;
 using Microsoft.EntityFrameworkCore;
-using System.Data.Common;
 using DesktopApplication.Service;
 
 namespace DesktopApplication
@@ -21,19 +20,17 @@ namespace DesktopApplication
             Configuration = configuration;
         }
 
-        
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
+
             services.AddDbContext<ApplicationDbContext>(options =>
-                   options.UseSqlite("Data Source=ElectronPoC.sqlite"));
-            DBConnections.
-            CreateDatabase();
+                options.UseSqlite("Data Source=ElectronPoC.sqlite"));
+
+            services.AddSingleton<DBConnections>();
         }
 
-
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider serviceProvider)
         {
             if (env.IsDevelopment())
             {
@@ -41,7 +38,6 @@ namespace DesktopApplication
             }
 
             app.UseStaticFiles();
-
             app.UseRouting();
 
             app.UseEndpoints(endpoints =>
@@ -49,15 +45,30 @@ namespace DesktopApplication
                 endpoints.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}");
             });
 
+            InitializeDatabase(serviceProvider);
+
             if (HybridSupport.IsElectronActive)
             {
                 ElectronBootstrap();
             }
         }
 
+        private void InitializeDatabase(IServiceProvider serviceProvider)
+        {
+            using (var scope = serviceProvider.CreateScope())
+            {
+                var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+                context.Database.Migrate();
+
+                // ✅ Call DBConnections to create additional tables if needed
+                //DBConnections.CreateDatabase();
+            }
+        }
+
         public async void ElectronBootstrap()
         {
-           var browserWindow = await Electron.WindowManager.CreateWindowAsync(new BrowserWindowOptions
+            var browserWindow = await Electron.WindowManager.CreateWindowAsync(new BrowserWindowOptions
             {
                 Width = 1152,
                 Height = 940,
@@ -69,8 +80,5 @@ namespace DesktopApplication
             browserWindow.OnReadyToShow += () => browserWindow.Show();
             browserWindow.SetTitle(Configuration["DemoTitleInSettings"]);
         }
-
-      
     }
-   
 }

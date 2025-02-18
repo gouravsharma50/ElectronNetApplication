@@ -1,56 +1,92 @@
-@model IEnumerable<DesktopApplication.Models.UserModel>
+@model Tuple<IEnumerable<DesktopApplication.Models.UserModel>, IEnumerable<DesktopApplication.Models.CategoryModel>>
+
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Users & Categories";
 }
 
-<h1>Index</h1>
-<div class="d-flex justify-content-between">
-    <a asp-action="Create">Create New User</a>
-    <a asp-controller="User" asp-action="Create">Create New Category</a>
-    <a asp-controller="Home" asp-action="Index">Back to Home</a>
+<h1>Users & Categories</h1>
+
+<!-- Bootstrap Tabs -->
+<ul class="nav nav-tabs" id="myTab" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="users-tab" data-bs-toggle="tab" data-bs-target="#users" type="button" role="tab" aria-controls="users" aria-selected="true">Users</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="categories-tab" data-bs-toggle="tab" data-bs-target="#categories" type="button" role="tab" aria-controls="categories" aria-selected="false">Categories</button>
+    </li>
+</ul>
+
+<div class="tab-content mt-3" id="myTabContent">
+    <!-- Users Tab -->
+    <div class="tab-pane fade show active" id="users" role="tabpanel" aria-labelledby="users-tab">
+        <div class="d-flex justify-content-between mb-2">
+            <a asp-action="Create" asp-controller="User" class="btn btn-primary">Create New User</a>
+        </div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>@Html.DisplayNameFor(model => model.Item1.First().Username)</th>
+                    <th>@Html.DisplayNameFor(model => model.Item1.First().CreatedDate)</th>
+                    <th>@Html.DisplayNameFor(model => model.Item1.First().Corporation)</th>
+                    <th>@Html.DisplayNameFor(model => model.Item1.First().Branch)</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var user in Model.Item1)
+                {
+                    <tr>
+                        <td>@user.Username</td>
+                        <td>@user.CreatedDate</td>
+                        <td>@user.Corporation?.CorporationName</td>
+                        <td>@user.Branch?.BranchName</td>
+                        <td>
+                            <a asp-action="Edit" asp-route-id="@user.UserId">Edit</a> |
+                            <a asp-action="Details" asp-route-id="@user.UserId">Details</a> |
+                            <a asp-action="Delete" asp-route-id="@user.UserId">Delete</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Categories Tab -->
+    <div class="tab-pane fade" id="categories" role="tabpanel" aria-labelledby="categories-tab">
+        <div class="d-flex justify-content-between mb-2">
+            <a asp-action="Create" asp-controller="Category" class="btn btn-primary">Create New Category</a>
+        </div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>@Html.DisplayNameFor(model => model.Item2.First().CategoryName)</th>
+                    <th>@Html.DisplayNameFor(model => model.Item2.First().CreatedDate)</th>
+                    <th>@Html.DisplayNameFor(model => model.Item2.First().Corporation)</th>
+                    <th>@Html.DisplayNameFor(model => model.Item2.First().Branch)</th>
+                    <th>@Html.DisplayNameFor(model => model.Item2.First().User)</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var category in Model.Item2)
+                {
+                    <tr>
+                        <td>@category.CategoryName</td>
+                        <td>@category.CreatedDate</td>
+                        <td>@category.Corporation?.CorporationName</td>
+                        <td>@category.Branch?.BranchName</td>
+                        <td>@category.User?.Username</td>
+                        <td>
+                            <a asp-controller="Category" asp-action="Edit" asp-route-id="@category.CategoryId">Edit</a> |
+                            <a asp-controller="Category" asp-action="Details" asp-route-id="@category.CategoryId">Details</a> |
+                            <a asp-controller="Category" asp-action="Delete" asp-route-id="@category.CategoryId">Delete</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 </div>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Username)
-            </th>
-           
-            <th>
-                @Html.DisplayNameFor(model => model.CreatedDate)
-            </th>
-            
-            <th>
-                @Html.DisplayNameFor(model => model.Corporation)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Branch)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Username)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreatedOn)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Corporation.CorporationName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Branch.BranchName)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.UserId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.UserId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.UserId">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+<!-- Include Bootstrap JavaScript for Tab Functionality -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

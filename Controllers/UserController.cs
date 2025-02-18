@@ -18,16 +18,12 @@ namespace DesktopApplication.Controllers
             _context = context;
         }
 
-        // GET: User
-        public async Task<IActionResult> Index()
+      
+        public IActionResult Index()
         {
-            // Fetch Users from database, including related Branch and Corporation entities
-            var applicationDbContext = _context.Users
-                                                .Include(u => u.Branch)
-                                                .Include(u => u.Corporation);
-
-            // Map Users to UserModels
-            var userModels = await applicationDbContext
+            var users = _context.Users
+                .Include(u => u.Corporation)
+                .Include(u => u.Branch)
                 .Select(u => new UserModel
                 {
                     UserId = u.UserId,
@@ -36,10 +32,30 @@ namespace DesktopApplication.Controllers
                     Corporation = u.Corporation,
                     Branch = u.Branch
                 })
-                .ToListAsync();
+                .ToList();
 
-            // Return the mapped UserModels to the view
-            return View(userModels);
+            var categories = _context.Categories
+                .Include(c => c.Corporation)
+                .Include(c => c.Branch)
+                .Include(c => c.User)
+                .Select(c => new CategoryModel
+                {
+                    CategoryId = c.CategoryId,
+                    CorporationId = c.CorporationId,
+                    BranchId = c.BranchId,
+                    CreatedByUserId = c.CreatedByUserId,
+                    CategoryName = c.CategoryName,
+                    CreatedDate = c.CreatedDate,
+                    IsSync = c.IsSync,
+                    Corporation = c.Corporation,
+                    Branch = c.Branch,
+                    User = c.User
+                })
+                .ToList();
+
+            var model = new Tuple<IEnumerable<UserModel>, IEnumerable<CategoryModel>>(users, categories);
+
+            return View(model);
         }
 
 
