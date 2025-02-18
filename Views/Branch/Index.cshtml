@@ -3,14 +3,7 @@
 @{
     ViewData["Title"] = "Branch Index";
 }
-<style>
-    body {
-        background-image: url('assets\branchhome.jpg');
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-    }
-</style>
+<link href="~/css/stylemain.css" rel="stylesheet" />
 <h1> Branch Index</h1>
 <div class="d-flex justify-content-between">
     <a asp-action="Create">Create New Branch</a>
@@ -54,3 +47,6 @@
         }
     </tbody>
 </table>
+<div class="main">
+    <img src="~/assets/branchhome.jpg"  alt="branch home"/>
+</div>

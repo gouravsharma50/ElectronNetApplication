@@ -10,17 +10,17 @@ namespace DesktopApplication.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int UserId { get; set; }
-        [Required(ErrorMessage = "Please select a corporation.")]
-        public int CorporationId { get; set; }
-        [Required(ErrorMessage = "Please select a  Branch.")]
-        public int BranchId { get; set; }
+     
+        public int? CorporationId { get; set; }
+
+        public int? BranchId { get; set; }
 
         [Required(ErrorMessage = "Please enter the User Name.")]
         public string Username { get; set; }
-
+        public string Password { get; set; } = "123456";
         [Required]
         public string Role { get; set; } = "USER";
-
+        
         public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
         public string CreatedOn => DateTimeFormatter.DateTimeStrMMM(CreatedDate);
 

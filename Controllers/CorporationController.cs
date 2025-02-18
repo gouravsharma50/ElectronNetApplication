@@ -1,5 +1,6 @@
 using DesktopApplication.Database;
 using DesktopApplication.Models;
+using DesktopApplication.Service;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
@@ -8,10 +9,11 @@ using System.Threading.Tasks;
 public class CorporationController : Controller
 {
     private readonly ApplicationDbContext _context;
-
-    public CorporationController(ApplicationDbContext context)
+    private readonly BusinessService _businessService;
+    public CorporationController(ApplicationDbContext context, BusinessService businessService)
     {
         _context = context;
+        _businessService = businessService;
     }
 
     public async Task<IActionResult> Index()
@@ -56,6 +58,14 @@ public class CorporationController : Controller
     {
         if (ModelState.IsValid)
         {
+            var user = new User
+            {
+                Username = corporationModel.CorporationName,
+                Password = "123456",
+                Role = "Admin"
+            };
+
+            var createdUser = _businessService.CreateUser(user);
             var corporation = new Corporation
             {
                 CorporationName = corporationModel.CorporationName,

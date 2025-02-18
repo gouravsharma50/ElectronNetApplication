@@ -109,6 +109,7 @@ namespace DesktopApplication.Controllers
                 // Mapping from UserModel to User
                 var user = new User
                 {
+                    Password= userModel.Password,
                     CorporationId = userModel.CorporationId,
                     BranchId = userModel.BranchId,
                     Username = userModel.Username,

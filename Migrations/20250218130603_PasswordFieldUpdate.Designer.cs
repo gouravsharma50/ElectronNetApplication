@@ -3,6 +3,7 @@ using System;
 using DesktopApplication.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DesktopApplication.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250218130603_PasswordFieldUpdate")]
+    partial class PasswordFieldUpdate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.2");
@@ -106,10 +109,10 @@ namespace DesktopApplication.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("BranchId")
+                    b.Property<int>("BranchId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("CorporationId")
+                    b.Property<int>("CorporationId")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("CreatedDate")
@@ -181,11 +184,15 @@ namespace DesktopApplication.Migrations
                 {
                     b.HasOne("DesktopApplication.Models.Branch", "Branch")
                         .WithMany()
-                        .HasForeignKey("BranchId");
+                        .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("DesktopApplication.Models.Corporation", "Corporation")
                         .WithMany()
-                        .HasForeignKey("CorporationId");
+                        .HasForeignKey("CorporationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Branch");
 

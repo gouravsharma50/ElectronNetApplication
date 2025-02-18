@@ -1,5 +1,6 @@
 using DesktopApplication.Database;
 using DesktopApplication.Models;
+using DesktopApplication.Service;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -9,10 +10,11 @@ using System.Threading.Tasks;
 public class BranchController : Controller
 {
     private readonly ApplicationDbContext _context;
-
-    public BranchController(ApplicationDbContext context)
+    private readonly BusinessService _businessService;
+    public BranchController(ApplicationDbContext context, BusinessService businessService)
     {
         _context = context;
+        _businessService = businessService;
     }
 
     // GET: Branch
@@ -76,6 +78,14 @@ public class BranchController : Controller
     {
         if (ModelState.IsValid)
         {
+            var user = new User
+            {
+                Username = branchModel.BranchName,
+                Password = "123456",
+                Role = "Branch"
+            };
+
+            var createdUser = _businessService.CreateUser(user);
             var branch = new Branch
             {
                 BranchName = branchModel.BranchName,

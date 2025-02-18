@@ -23,11 +23,14 @@ namespace DesktopApplication
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
+      
 
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlite("Data Source=ElectronPoC.sqlite"));
-
+           
             services.AddSingleton<DBConnections>();
+            // Register BusinessService
+            services.AddScoped<BusinessService>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider serviceProvider)
@@ -57,6 +60,7 @@ namespace DesktopApplication
         {
             using (var scope = serviceProvider.CreateScope())
             {
+
                 var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
                 context.Database.Migrate();

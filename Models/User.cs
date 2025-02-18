@@ -10,24 +10,25 @@ namespace DesktopApplication.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int UserId { get; set; }
 
-        public int CorporationId { get; set; }
+        public int? CorporationId { get; set; }
 
-        public int BranchId { get; set; }
+        public int? BranchId { get; set; }
 
         [Required]
         public string Username { get; set; }
-
         [Required]
-        public string Role { get; set; }
+        public string Password { get; set; } = "123456";
+        [Required]
+        public string Role { get; set; } = "USER";
 
         public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
 
         public bool IsSync { get; set; } = false;
 
         [ForeignKey("CorporationId")]
-        public Corporation Corporation { get; set; }
+        public Corporation? Corporation { get; set; }
 
         [ForeignKey("BranchId")]
-        public Branch Branch { get; set; }
+        public Branch? Branch { get; set; }
     }
 }
