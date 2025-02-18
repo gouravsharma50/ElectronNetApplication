@@ -1,4 +1,4 @@
-@model DesktopApplication.Models.Corporation
+@model DesktopApplication.Models.CorporationModel
 
 @{
     ViewData["Title"] = "Create";
@@ -17,11 +17,7 @@
                 <input asp-for="CorporationName" class="form-control" />
                 <span asp-validation-for="CorporationName" class="text-danger"></span>
             </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="IsSync" /> @Html.DisplayNameFor(model => model.IsSync)
-                </label>
-            </div>
+            
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>

@@ -1,14 +1,18 @@
-@model IEnumerable<DesktopApplication.Models.Corporation>
+ @model IEnumerable<DesktopApplication.Models.CorporationModel>
 
 @{
     ViewData["Title"] = "Corporation Index";
 }
 
-<h1>Index</h1>
+<h1>Corporations</h1>
 
 <p>
     <a asp-action="Create">Create New</a>
 </p>
+
+<div>
+    <a asp-controller="Home" asp-action="Index">Back to Home</a>
+</div>
 <table class="table">
     <thead>
         <tr>
@@ -16,7 +20,7 @@
                 @Html.DisplayNameFor(model => model.CorporationName)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.IsSync)
+                @Html.DisplayNameFor(model => model.CreatedOn)
             </th>
             <th></th>
         </tr>
@@ -28,7 +32,7 @@
                 @Html.DisplayFor(modelItem => item.CorporationName)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.IsSync)
+                    @Html.DisplayFor(modelItem => item.CreatedOn)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.CorporationId">Edit</a> |
@@ -39,3 +43,11 @@
 }
     </tbody>
 </table>
+
+
+
+
+
+
+       
+

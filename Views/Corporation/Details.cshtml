@@ -1,10 +1,11 @@
-@model DesktopApplication.Models.Corporation
+@model DesktopApplication.Models.CorporationModel
+
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Corporation Details";
 }
 
-<h1>Details</h1>
+<h1>Corporation Details</h1>
 
 <div>
     <h4>Corporation</h4>
@@ -17,10 +18,10 @@
             @Html.DisplayFor(model => model.CorporationName)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.IsSync)
+            @Html.DisplayNameFor(model => model.CreatedOn)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.IsSync)
+            @Html.DisplayFor(model => model.CreatedOn)
         </dd>
     </dl>
 </div>
@@ -28,3 +29,7 @@
     <a asp-action="Edit" asp-route-id="@Model?.CorporationId">Edit</a> |
     <a asp-action="Index">Back to List</a>
 </div>
+
+
+
+

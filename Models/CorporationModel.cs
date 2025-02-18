@@ -1,21 +1,19 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using DesktopApplication.Utilities;
 
 namespace DesktopApplication.Models
 {
-    public class Corporation
+    public class CorporationModel
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int CorporationId { get; set; }
-
         [Required]
         public string CorporationName { get; set; }
-        public DateTime CorporationCreatedOn { get; set; } = DateTime.UtcNow;
-
+        public int CorporationId { get; set; }
+        public DateTime CorporationCreatedOn { get; set; }
         public bool IsSync { get; set; } = false;
-
-        public ICollection<Branch> Branches { get; set; }
+        public string CreatedOn => DateTimeFormatter.DateTimeStrMMM(CorporationCreatedOn);
     }
+   
+
 }
