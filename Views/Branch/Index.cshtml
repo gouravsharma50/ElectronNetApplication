@@ -1,7 +1,7 @@
-@model IEnumerable<DesktopApplication.Models.Branch>
+@model IEnumerable<DesktopApplication.Models.BranchModel>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Branch Index";
 }
 <style>
     body {
@@ -12,10 +12,11 @@
     }
 </style>
 <h1> Branch Index</h1>
+<div class="d-flex justify-content-between">
+    <a asp-action="Create">Create New Branch</a>
+    <a asp-controller="Home" asp-action="Index">Back to Home</a>
+</div>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
 <table class="table">
     <thead>
         <tr>
@@ -26,41 +27,30 @@
                 @Html.DisplayNameFor(model => model.BranchCreatedDate)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.IsSync)
-            </th>
-            <th>
                 @Html.DisplayNameFor(model => model.Corporation)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.User)
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.BranchName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.BranchCreatedDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IsSync)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Corporation.CorporationName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.User.Role)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.BranchId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.BranchId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.BranchId">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.BranchName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CreatedOn)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Corporation.CorporationName)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.BranchId">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.BranchId">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.BranchId">Delete</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>

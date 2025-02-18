@@ -1,12 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using DesktopApplication.Database;
 using DesktopApplication.Models;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace DesktopApplication.Controllers
 {
@@ -22,8 +20,26 @@ namespace DesktopApplication.Controllers
         // GET: Category
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Categories.Include(c => c.Branch).Include(c => c.Corporation).Include(c => c.User);
-            return View(await applicationDbContext.ToListAsync());
+            var categories = await _context.Categories
+                .Include(c => c.Branch)
+                .Include(c => c.Corporation)
+                .Include(c => c.User)
+                .Select(c => new CategoryModel
+                {
+                    CategoryId = c.CategoryId,
+                    CorporationId = c.CorporationId,
+                    BranchId = c.BranchId,
+                    CreatedByUserId = c.CreatedByUserId,
+                    CategoryName = c.CategoryName,
+                    CreatedDate = c.CreatedDate,
+                    IsSync = c.IsSync,
+                    Corporation = c.Corporation,
+                    Branch = c.Branch,
+                    User = c.User
+                })
+                .ToListAsync();
+
+            return View(categories);
         }
 
         // GET: Category/Details/5
@@ -38,13 +54,29 @@ namespace DesktopApplication.Controllers
                 .Include(c => c.Branch)
                 .Include(c => c.Corporation)
                 .Include(c => c.User)
-                .FirstOrDefaultAsync(m => m.CategoryId == id);
+                .Where(m => m.CategoryId == id)
+                .FirstOrDefaultAsync();
+
             if (category == null)
             {
                 return NotFound();
             }
 
-            return View(category);
+            var categoryModel = new CategoryModel
+            {
+                CategoryId = category.CategoryId,
+                CorporationId = category.CorporationId,
+                BranchId = category.BranchId,
+                CreatedByUserId = category.CreatedByUserId,
+                CategoryName = category.CategoryName,
+                CreatedDate = category.CreatedDate,
+                IsSync = category.IsSync,
+                Corporation = category.Corporation,
+                Branch = category.Branch,
+                User = category.User
+            };
+
+            return View(categoryModel);
         }
 
         // GET: Category/Create
@@ -52,27 +84,36 @@ namespace DesktopApplication.Controllers
         {
             ViewData["BranchId"] = new SelectList(_context.Branches, "BranchId", "BranchName");
             ViewData["CorporationId"] = new SelectList(_context.Corporations, "CorporationId", "CorporationName");
-            ViewData["CreatedByUserId"] = new SelectList(_context.Users, "UserId", "Role");
+            ViewData["CreatedByUserId"] = new SelectList(_context.Users, "UserId", "Username");
             return View();
         }
 
         // POST: Category/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("CategoryId,CorporationId,BranchId,CreatedByUserId,CategoryName,CreatedDate,IsSync")] Category category)
+        public async Task<IActionResult> Create([Bind("CorporationId,BranchId,CreatedByUserId,CategoryName,IsSync")] CategoryModel categoryModel)
         {
             if (ModelState.IsValid)
             {
+                var category = new Category
+                {
+                    CorporationId = categoryModel.CorporationId,
+                    BranchId = categoryModel.BranchId,
+                    CreatedByUserId = categoryModel.CreatedByUserId,
+                    CategoryName = categoryModel.CategoryName,
+                    CreatedDate = DateTime.UtcNow, // Default value for CreatedDate
+                    IsSync = categoryModel.IsSync // Default value for IsSync
+                };
+
                 _context.Add(category);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["BranchId"] = new SelectList(_context.Branches, "BranchId", "BranchName", category.BranchId);
-            ViewData["CorporationId"] = new SelectList(_context.Corporations, "CorporationId", "CorporationName", category.CorporationId);
-            ViewData["CreatedByUserId"] = new SelectList(_context.Users, "UserId", "Role", category.CreatedByUserId);
-            return View(category);
+
+            ViewData["BranchId"] = new SelectList(_context.Branches, "BranchId", "BranchName", categoryModel.BranchId);
+            ViewData["CorporationId"] = new SelectList(_context.Corporations, "CorporationId", "CorporationName", categoryModel.CorporationId);
+            ViewData["CreatedByUserId"] = new SelectList(_context.Users, "UserId", "Role", categoryModel.CreatedByUserId);
+            return View(categoryModel);
         }
 
         // GET: Category/Edit/5
@@ -88,20 +129,30 @@ namespace DesktopApplication.Controllers
             {
                 return NotFound();
             }
-            ViewData["BranchId"] = new SelectList(_context.Branches, "BranchId", "BranchName", category.BranchId);
-            ViewData["CorporationId"] = new SelectList(_context.Corporations, "CorporationId", "CorporationName", category.CorporationId);
-            ViewData["CreatedByUserId"] = new SelectList(_context.Users, "UserId", "Role", category.CreatedByUserId);
-            return View(category);
+
+            var categoryModel = new CategoryModel
+            {
+                CategoryId = category.CategoryId,
+                CorporationId = category.CorporationId,
+                BranchId = category.BranchId,
+                CreatedByUserId = category.CreatedByUserId,
+                CategoryName = category.CategoryName,
+                CreatedDate = category.CreatedDate,
+                IsSync = category.IsSync
+            };
+
+            ViewData["BranchId"] = new SelectList(_context.Branches, "BranchId", "BranchName", categoryModel.BranchId);
+            ViewData["CorporationId"] = new SelectList(_context.Corporations, "CorporationId", "CorporationName", categoryModel.CorporationId);
+            ViewData["CreatedByUserId"] = new SelectList(_context.Users, "UserId", "Role", categoryModel.CreatedByUserId);
+            return View(categoryModel);
         }
 
         // POST: Category/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("CategoryId,CorporationId,BranchId,CreatedByUserId,CategoryName,CreatedDate,IsSync")] Category category)
+        public async Task<IActionResult> Edit(int id, [Bind("CategoryId,CorporationId,BranchId,CreatedByUserId,CategoryName,CreatedDate,IsSync")] CategoryModel categoryModel)
         {
-            if (id != category.CategoryId)
+            if (id != categoryModel.CategoryId)
             {
                 return NotFound();
             }
@@ -110,12 +161,23 @@ namespace DesktopApplication.Controllers
             {
                 try
                 {
-                    _context.Update(category);
-                    await _context.SaveChangesAsync();
+                    var category = await _context.Categories.FindAsync(id);
+                    if (category != null)
+                    {
+                        category.CorporationId = categoryModel.CorporationId;
+                        category.BranchId = categoryModel.BranchId;
+                        category.CreatedByUserId = categoryModel.CreatedByUserId;
+                        category.CategoryName = categoryModel.CategoryName;
+                        category.CreatedDate = categoryModel.CreatedDate; // Use existing CreatedDate if needed
+                        category.IsSync = categoryModel.IsSync;
+
+                        _context.Update(category);
+                        await _context.SaveChangesAsync();
+                    }
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!CategoryExists(category.CategoryId))
+                    if (!CategoryExists(categoryModel.CategoryId))
                     {
                         return NotFound();
                     }
@@ -126,10 +188,11 @@ namespace DesktopApplication.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["BranchId"] = new SelectList(_context.Branches, "BranchId", "BranchName", category.BranchId);
-            ViewData["CorporationId"] = new SelectList(_context.Corporations, "CorporationId", "CorporationName", category.CorporationId);
-            ViewData["CreatedByUserId"] = new SelectList(_context.Users, "UserId", "Role", category.CreatedByUserId);
-            return View(category);
+
+            ViewData["BranchId"] = new SelectList(_context.Branches, "BranchId", "BranchName", categoryModel.BranchId);
+            ViewData["CorporationId"] = new SelectList(_context.Corporations, "CorporationId", "CorporationName", categoryModel.CorporationId);
+            ViewData["CreatedByUserId"] = new SelectList(_context.Users, "UserId", "Role", categoryModel.CreatedByUserId);
+            return View(categoryModel);
         }
 
         // GET: Category/Delete/5
@@ -150,7 +213,18 @@ namespace DesktopApplication.Controllers
                 return NotFound();
             }
 
-            return View(category);
+            var categoryModel = new CategoryModel
+            {
+                CategoryId = category.CategoryId,
+                CorporationId = category.CorporationId,
+                BranchId = category.BranchId,
+                CreatedByUserId = category.CreatedByUserId,
+                CategoryName = category.CategoryName,
+                CreatedDate = category.CreatedDate,
+                IsSync = category.IsSync
+            };
+
+            return View(categoryModel);
         }
 
         // POST: Category/Delete/5
@@ -162,9 +236,8 @@ namespace DesktopApplication.Controllers
             if (category != null)
             {
                 _context.Categories.Remove(category);
+                await _context.SaveChangesAsync();
             }
-
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 

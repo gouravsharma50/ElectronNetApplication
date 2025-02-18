@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -22,9 +21,27 @@ namespace DesktopApplication.Controllers
         // GET: User
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Users.Include(u => u.Branch).Include(u => u.Corporation);
-            return View(await applicationDbContext.ToListAsync());
+            // Fetch Users from database, including related Branch and Corporation entities
+            var applicationDbContext = _context.Users
+                                                .Include(u => u.Branch)
+                                                .Include(u => u.Corporation);
+
+            // Map Users to UserModels
+            var userModels = await applicationDbContext
+                .Select(u => new UserModel
+                {
+                    UserId = u.UserId,
+                    Username = u.Username,
+                    CreatedDate = u.CreatedDate,
+                    Corporation = u.Corporation,
+                    Branch = u.Branch
+                })
+                .ToListAsync();
+
+            // Return the mapped UserModels to the view
+            return View(userModels);
         }
+
 
         // GET: User/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -38,13 +55,26 @@ namespace DesktopApplication.Controllers
                 .Include(u => u.Branch)
                 .Include(u => u.Corporation)
                 .FirstOrDefaultAsync(m => m.UserId == id);
+
             if (user == null)
             {
                 return NotFound();
             }
 
-            return View(user);
+            // Map the User entity to UserModel
+            var userModel = new UserModel
+            {
+                UserId = user.UserId,
+                Username = user.Username,
+                CreatedDate = user.CreatedDate,
+                Corporation = user.Corporation,
+                Branch = user.Branch
+            };
+
+            // Return the mapped UserModel to the view
+            return View(userModel);
         }
+
 
         // GET: User/Create
         public IActionResult Create()
@@ -54,22 +84,31 @@ namespace DesktopApplication.Controllers
             return View();
         }
 
-        // POST: User/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("UserId,CorporationId,BranchId,Username,Role,CreatedDate,IsSync")] User user)
+        public async Task<IActionResult> Create([Bind("CorporationId,BranchId,Username")] UserModel userModel)
         {
             if (ModelState.IsValid)
             {
+                // Mapping from UserModel to User
+                var user = new User
+                {
+                    CorporationId = userModel.CorporationId,
+                    BranchId = userModel.BranchId,
+                    Username = userModel.Username,
+                    Role = "USER", // Default role
+                    CreatedDate = DateTime.UtcNow, // Default created date
+                    IsSync = false // Default IsSync value
+                };
+
                 _context.Add(user);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["BranchId"] = new SelectList(_context.Branches, "BranchId", "BranchName", user.BranchId);
-            ViewData["CorporationId"] = new SelectList(_context.Corporations, "CorporationId", "CorporationName", user.CorporationId);
-            return View(user);
+
+            ViewData["BranchId"] = new SelectList(_context.Branches, "BranchId", "BranchName", userModel.BranchId);
+            ViewData["CorporationId"] = new SelectList(_context.Corporations, "CorporationId", "CorporationName", userModel.CorporationId);
+            return View(userModel);
         }
 
         // GET: User/Edit/5
@@ -85,19 +124,29 @@ namespace DesktopApplication.Controllers
             {
                 return NotFound();
             }
-            ViewData["BranchId"] = new SelectList(_context.Branches, "BranchId", "BranchName", user.BranchId);
-            ViewData["CorporationId"] = new SelectList(_context.Corporations, "CorporationId", "CorporationName", user.CorporationId);
-            return View(user);
+
+            var userModel = new UserModel
+            {
+                UserId = user.UserId,
+                CorporationId = user.CorporationId,
+                BranchId = user.BranchId,
+                Username = user.Username,
+                Role = user.Role,
+                CreatedDate = user.CreatedDate,
+                IsSync = user.IsSync
+            };
+
+            ViewData["BranchId"] = new SelectList(_context.Branches, "BranchId", "BranchName", userModel.BranchId);
+            ViewData["CorporationId"] = new SelectList(_context.Corporations, "CorporationId", "CorporationName", userModel.CorporationId);
+            return View(userModel);
         }
 
         // POST: User/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("UserId,CorporationId,BranchId,Username,Role,CreatedDate,IsSync")] User user)
+        public async Task<IActionResult> Edit(int id, [Bind("UserId,CorporationId,BranchId,Username,Role,CreatedDate,IsSync")] UserModel userModel)
         {
-            if (id != user.UserId)
+            if (id != userModel.UserId)
             {
                 return NotFound();
             }
@@ -106,12 +155,25 @@ namespace DesktopApplication.Controllers
             {
                 try
                 {
+                    var user = await _context.Users.FindAsync(id);
+                    if (user == null)
+                    {
+                        return NotFound();
+                    }
+
+                    user.CorporationId = userModel.CorporationId;
+                    user.BranchId = userModel.BranchId;
+                    user.Username = userModel.Username;
+                    user.Role = userModel.Role; // Allow role editing
+                    user.CreatedDate = userModel.CreatedDate; // Allow updating CreatedDate if needed
+                    user.IsSync = userModel.IsSync; // Allow updating IsSync if needed
+
                     _context.Update(user);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!UserExists(user.UserId))
+                    if (!UserExists(userModel.UserId))
                     {
                         return NotFound();
                     }
@@ -122,9 +184,10 @@ namespace DesktopApplication.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["BranchId"] = new SelectList(_context.Branches, "BranchId", "BranchName", user.BranchId);
-            ViewData["CorporationId"] = new SelectList(_context.Corporations, "CorporationId", "CorporationName", user.CorporationId);
-            return View(user);
+
+            ViewData["BranchId"] = new SelectList(_context.Branches, "BranchId", "BranchName", userModel.BranchId);
+            ViewData["CorporationId"] = new SelectList(_context.Corporations, "CorporationId", "CorporationName", userModel.CorporationId);
+            return View(userModel);
         }
 
         // GET: User/Delete/5
@@ -139,12 +202,24 @@ namespace DesktopApplication.Controllers
                 .Include(u => u.Branch)
                 .Include(u => u.Corporation)
                 .FirstOrDefaultAsync(m => m.UserId == id);
+
             if (user == null)
             {
                 return NotFound();
             }
 
-            return View(user);
+            // Map the User entity to UserModel
+            var userModel = new UserModel
+            {
+                UserId = user.UserId,
+                Username = user.Username,
+                CreatedDate = user.CreatedDate,
+                Corporation = user.Corporation,
+                Branch = user.Branch
+            };
+
+            // Return the mapped UserModel to the view
+            return View(userModel);
         }
 
         // POST: User/Delete/5

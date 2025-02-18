@@ -6,13 +6,11 @@
 
 <h1>Corporations</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-
-<div>
+<div class="d-flex justify-content-between">
+    <a asp-action="Create">Create New Corporation</a>
     <a asp-controller="Home" asp-action="Index">Back to Home</a>
 </div>
+
 <table class="table">
     <thead>
         <tr>
@@ -35,9 +33,9 @@
                     @Html.DisplayFor(modelItem => item.CreatedOn)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.CorporationId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.CorporationId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.CorporationId">Delete</a>
+                    <a asp-action="Edit" asp-route-id="@item.CorporationId">Edit </a> |
+                    <a asp-action="Details" asp-route-id="@item.CorporationId">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.CorporationId">Delete </a>
             </td>
         </tr>
 }

@@ -7,7 +7,7 @@ namespace DesktopApplication.Models
 {
     public class CorporationModel
     {
-        [Required]
+        [Required(ErrorMessage = "Please enter the Corporation Name.")]
         public string CorporationName { get; set; }
         public int CorporationId { get; set; }
         public DateTime CorporationCreatedOn { get; set; }

@@ -1,48 +1,39 @@
-@model DesktopApplication.Models.Branch
+@model DesktopApplication.Models.BranchModel
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Branch Details";
 }
 
 <h1>Details</h1>
-
+<div class="d-flex justify-content-between">
+    <a asp-action="Index">Back to Branch List</a>
+    <a asp-action="Edit" asp-route-id="@Model?.BranchId">Edit Branch</a>
+    <a asp-controller="Home" asp-action="Index">Back to Home</a>
+</div>
 <div>
     <h4>Branch</h4>
     <hr />
     <dl class="row">
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.BranchName)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.BranchName)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.BranchCreatedDate)
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.BranchCreatedDate)
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.CreatedOn) 
         </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.IsSync)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.IsSync)
-        </dd>
-        <dt class = "col-sm-2">
+       
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Corporation)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Corporation.CorporationName)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.User)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.User.Role)
         </dd>
     </dl>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.BranchId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
+
+

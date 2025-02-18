@@ -1,6 +1,5 @@
-﻿using System;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DesktopApplication.Models
 {
@@ -13,8 +12,6 @@ namespace DesktopApplication.Models
         [Required]
         public string BranchName { get; set; }
 
-        public int CreatedByUserId { get; set; }
-
         public int CorporationId { get; set; }
 
         public DateTime BranchCreatedDate { get; set; } = DateTime.UtcNow;
@@ -23,8 +20,5 @@ namespace DesktopApplication.Models
 
         [ForeignKey("CorporationId")]
         public Corporation Corporation { get; set; }
-
-        [ForeignKey("CreatedByUserId")]
-        public User User { get; set; }
     }
 }

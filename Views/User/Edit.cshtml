@@ -1,11 +1,14 @@
-@model DesktopApplication.Models.User
+@model DesktopApplication.Models.UserModel
 
 @{
     ViewData["Title"] = "Edit";
 }
 
 <h1>Edit</h1>
-
+<div class="d-flex justify-content-between">
+    <a asp-action="Index">Back to User List</a>
+    <a asp-controller="Home" asp-action="Index">Back to Home</a>
+</div>
 <h4>User</h4>
 <hr />
 <div class="row">
@@ -28,21 +31,11 @@
                 <input asp-for="Username" class="form-control" />
                 <span asp-validation-for="Username" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="Role" class="control-label"></label>
-                <input asp-for="Role" class="form-control" />
-                <span asp-validation-for="Role" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CreatedDate" class="control-label"></label>
-                <input asp-for="CreatedDate" class="form-control" />
-                <span asp-validation-for="CreatedDate" class="text-danger"></span>
-            </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="IsSync" /> @Html.DisplayNameFor(model => model.IsSync)
-                </label>
-            </div>
+            
+            <input type="hidden" asp-for="Role" value="@Model.Role" />
+            <input type="hidden" asp-for="CreatedDate" value="@Model.CreatedOn" />
+
+            <input type="hidden" asp-for="IsSync" value="@Model.IsSync" />
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
             </div>
@@ -50,7 +43,5 @@
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+
 

@@ -7,7 +7,7 @@ namespace DesktopApplication.Service
 {
     public class DBConnections
     {
-        public void CreateDatabase()
+        public static void CreateDatabase()
         {
             var path = Path.Combine(Directory.GetCurrentDirectory(), "ElectronPoC.sqlite");
             bool newDatabase = !File.Exists(path); // Check if the database already exists
@@ -35,17 +35,16 @@ namespace DesktopApplication.Service
 
                     // Branch Table
                     command.CommandText = @"
-                        CREATE TABLE IF NOT EXISTS Branch (
-                            BranchId INTEGER PRIMARY KEY AUTOINCREMENT,
-                            CreatedByUserId INTEGER NOT NULL,
-                            CorporationId INTEGER NOT NULL,
-                            BranchName TEXT NOT NULL,
-                            BranchCreatedDate TEXT NOT NULL,
-                            IsSync INTEGER NOT NULL DEFAULT 0,
-                            FOREIGN KEY (CorporationId) REFERENCES Corporation(CorporationId),
-                            FOREIGN KEY (CreatedByUserId) REFERENCES User(UserId)
-                        );";
+                       CREATE TABLE IF NOT EXISTS Branch (
+                           BranchId INTEGER PRIMARY KEY AUTOINCREMENT,
+                           CorporationId INTEGER NOT NULL,
+                           BranchName TEXT NOT NULL,
+                           BranchCreatedDate TEXT NOT NULL,
+                           IsSync INTEGER NOT NULL DEFAULT 0,
+                           FOREIGN KEY (CorporationId) REFERENCES Corporation(CorporationId)
+                       );";
                     command.ExecuteNonQuery();
+
 
                     // User Table
                     command.CommandText = @"

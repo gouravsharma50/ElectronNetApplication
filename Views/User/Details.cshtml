@@ -1,11 +1,15 @@
-@model DesktopApplication.Models.User
+@model DesktopApplication.Models.UserModel
 
 @{
     ViewData["Title"] = "Details";
 }
 
 <h1>Details</h1>
-
+<div class="d-flex justify-content-between">
+    <a asp-action="Index">Back to User List</a>
+    <a asp-action="Edit" asp-route-id="@Model?.UserId">Edit User</a> 
+    <a asp-controller="Home" asp-action="Index">Back to Home</a>
+</div>
 <div>
     <h4>User</h4>
     <hr />
@@ -26,13 +30,7 @@
             @Html.DisplayNameFor(model => model.CreatedDate)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.CreatedDate)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.IsSync)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.IsSync)
+            @Html.DisplayFor(model => model.CreatedOn)
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Corporation)
@@ -48,7 +46,4 @@
         </dd>
     </dl>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.UserId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
+

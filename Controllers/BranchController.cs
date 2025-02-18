@@ -1,170 +1,201 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using DesktopApplication.Database;
+using DesktopApplication.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using DesktopApplication.Database;
-using DesktopApplication.Models;
+using System.Linq;
+using System.Threading.Tasks;
 
-namespace DesktopApplication.Controllers
+public class BranchController : Controller
 {
-    public class BranchController : Controller
+    private readonly ApplicationDbContext _context;
+
+    public BranchController(ApplicationDbContext context)
     {
-        private readonly ApplicationDbContext _context;
+        _context = context;
+    }
 
-        public BranchController(ApplicationDbContext context)
+    // GET: Branch
+    public async Task<IActionResult> Index()
+    {
+        var branches = await _context.Branches
+            .Include(b => b.Corporation)
+            .Select(b => new BranchModel
+            {
+                BranchId = b.BranchId,
+                BranchName = b.BranchName,
+                CorporationId = b.CorporationId,
+                BranchCreatedDate = b.BranchCreatedDate,
+                Corporation = b.Corporation
+            })
+            .ToListAsync();
+
+        return View(branches);
+    }
+
+    // GET: Branch/Details/5
+    public async Task<IActionResult> Details(int? id)
+    {
+        if (id == null)
         {
-            _context = context;
+            return NotFound();
         }
 
-        // GET: Branch
-        public async Task<IActionResult> Index()
+        var branch = await _context.Branches
+            .Include(b => b.Corporation)
+            .FirstOrDefaultAsync(m => m.BranchId == id);
+
+        if (branch == null)
         {
-            var applicationDbContext = _context.Branches.Include(b => b.Corporation).Include(b => b.User);
-            return View(await applicationDbContext.ToListAsync());
+            return NotFound();
         }
 
-        // GET: Branch/Details/5
-        public async Task<IActionResult> Details(int? id)
+        var branchModel = new BranchModel
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            BranchId = branch.BranchId,
+            BranchName = branch.BranchName,
+            CorporationId = branch.CorporationId,
+            BranchCreatedDate = branch.BranchCreatedDate,
+            Corporation = branch.Corporation
+        };
 
-            var branch = await _context.Branches
-                .Include(b => b.Corporation)
-                .Include(b => b.User)
-                .FirstOrDefaultAsync(m => m.BranchId == id);
-            if (branch == null)
-            {
-                return NotFound();
-            }
+        return View(branchModel);
+    }
 
-            return View(branch);
-        }
+    // GET: Branch/Create
+    public IActionResult Create()
+    {
+        ViewData["CorporationId"] = new SelectList(_context.Corporations, "CorporationId", "CorporationName");
+        return View();
+    }
 
-        // GET: Branch/Create
-        public IActionResult Create()
+    // POST: Branch/Create
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Create([Bind("BranchId,BranchName,CorporationId")] BranchModel branchModel)
+    {
+        if (ModelState.IsValid)
         {
-            ViewData["CorporationId"] = new SelectList(_context.Corporations, "CorporationId", "CorporationName");
-            ViewData["CreatedByUserId"] = new SelectList(_context.Users, "UserId", "Role");
-            return View();
-        }
-
-        // POST: Branch/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("BranchId,BranchName,CreatedByUserId,CorporationId,BranchCreatedDate,IsSync")] Branch branch)
-        {
-            if (ModelState.IsValid)
+            var branch = new Branch
             {
-                _context.Add(branch);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["CorporationId"] = new SelectList(_context.Corporations, "CorporationId", "CorporationName", branch.CorporationId);
-            ViewData["CreatedByUserId"] = new SelectList(_context.Users, "UserId", "Role", branch.CreatedByUserId);
-            return View(branch);
-        }
+                BranchName = branchModel.BranchName,
+                CorporationId = branchModel.CorporationId,
+                BranchCreatedDate = DateTime.UtcNow, 
+                IsSync = false 
+            };
 
-        // GET: Branch/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var branch = await _context.Branches.FindAsync(id);
-            if (branch == null)
-            {
-                return NotFound();
-            }
-            ViewData["CorporationId"] = new SelectList(_context.Corporations, "CorporationId", "CorporationName", branch.CorporationId);
-            ViewData["CreatedByUserId"] = new SelectList(_context.Users, "UserId", "Role", branch.CreatedByUserId);
-            return View(branch);
-        }
-
-        // POST: Branch/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("BranchId,BranchName,CreatedByUserId,CorporationId,BranchCreatedDate,IsSync")] Branch branch)
-        {
-            if (id != branch.BranchId)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(branch);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!BranchExists(branch.BranchId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["CorporationId"] = new SelectList(_context.Corporations, "CorporationId", "CorporationName", branch.CorporationId);
-            ViewData["CreatedByUserId"] = new SelectList(_context.Users, "UserId", "Role", branch.CreatedByUserId);
-            return View(branch);
-        }
-
-        // GET: Branch/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var branch = await _context.Branches
-                .Include(b => b.Corporation)
-                .Include(b => b.User)
-                .FirstOrDefaultAsync(m => m.BranchId == id);
-            if (branch == null)
-            {
-                return NotFound();
-            }
-
-            return View(branch);
-        }
-
-        // POST: Branch/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var branch = await _context.Branches.FindAsync(id);
-            if (branch != null)
-            {
-                _context.Branches.Remove(branch);
-            }
-
+            _context.Add(branch);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool BranchExists(int id)
+        ViewData["CorporationId"] = new SelectList(_context.Corporations, "CorporationId", "CorporationName", branchModel.CorporationId);
+        return View(branchModel);
+    }
+
+    // GET: Branch/Edit/5
+    public async Task<IActionResult> Edit(int? id)
+    {
+        if (id == null)
         {
-            return _context.Branches.Any(e => e.BranchId == id);
+            return NotFound();
         }
+
+        var branch = await _context.Branches.FindAsync(id);
+        if (branch == null)
+        {
+            return NotFound();
+        }
+
+        var branchModel = new BranchModel
+        {
+            BranchId = branch.BranchId,
+            BranchName = branch.BranchName,
+            CorporationId = branch.CorporationId,
+            // BranchCreatedDate and IsSync are handled by the database
+        };
+
+        ViewData["CorporationId"] = new SelectList(_context.Corporations, "CorporationId", "CorporationName", branch.CorporationId);
+        return View(branchModel);
+    }
+
+    // POST: Branch/Edit/5
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(int id, [Bind("BranchId,BranchName,CorporationId")] BranchModel branchModel)
+    {
+        if (id != branchModel.BranchId)
+        {
+            return NotFound();
+        }
+
+        if (ModelState.IsValid)
+        {
+            var branch = await _context.Branches.FindAsync(id);
+
+            if (branch == null)
+            {
+                return NotFound();
+            }
+
+            branch.BranchName = branchModel.BranchName;
+            branch.CorporationId = branchModel.CorporationId;
+            // Do not update BranchCreatedDate or IsSync; these are managed on the database level
+
+            _context.Update(branch);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+        ViewData["CorporationId"] = new SelectList(_context.Corporations, "CorporationId", "CorporationName", branchModel.CorporationId);
+        return View(branchModel);
+    }
+
+    // GET: Branch/Delete/5
+    public async Task<IActionResult> Delete(int? id)
+    {
+        if (id == null)
+        {
+            return NotFound();
+        }
+
+        var branch = await _context.Branches
+            .Include(b => b.Corporation)
+            .FirstOrDefaultAsync(m => m.BranchId == id);
+
+        if (branch == null)
+        {
+            return NotFound();
+        }
+
+        var branchModel = new BranchModel
+        {
+            BranchId = branch.BranchId,
+            BranchName = branch.BranchName,
+            CorporationId = branch.CorporationId,
+            BranchCreatedDate = branch.BranchCreatedDate,
+            Corporation = branch.Corporation
+        };
+
+        return View(branchModel);
+    }
+
+    // POST: Branch/Delete/5
+    [HttpPost, ActionName("Delete")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteConfirmed(int id)
+    {
+        var branch = await _context.Branches.FindAsync(id);
+        if (branch != null)
+        {
+            _context.Branches.Remove(branch);
+            await _context.SaveChangesAsync();
+        }
+        return RedirectToAction(nameof(Index));
+    }
+
+    private bool BranchExists(int id)
+    {
+        return _context.Branches.Any(e => e.BranchId == id);
     }
 }

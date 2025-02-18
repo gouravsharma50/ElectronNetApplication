@@ -16,8 +16,7 @@ namespace DesktopApplication.Database
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-
-            // Define Relationships
+           
             modelBuilder.Entity<Branch>()
                 .HasOne(b => b.Corporation)
                 .WithMany(c => c.Branches)

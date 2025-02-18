@@ -1,4 +1,4 @@
-@model IEnumerable<DesktopApplication.Models.Category>
+@model IEnumerable<DesktopApplication.Models.CategoryModel>
 
 @{
     ViewData["Title"] = "Index";
@@ -6,9 +6,10 @@
 
 <h1>Index</h1>
 
-<p>
+<div class="d-flex justify-content-between">
     <a asp-action="Create">Create New</a>
-</p>
+    <a asp-controller="Home" asp-action="Index">Back to Home</a>
+</div>
 <table class="table">
     <thead>
         <tr>
@@ -17,9 +18,6 @@
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.CreatedDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IsSync)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Corporation)
@@ -40,10 +38,7 @@
                 @Html.DisplayFor(modelItem => item.CategoryName)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.CreatedDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IsSync)
+                @Html.DisplayFor(modelItem => item.CreatedOn)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Corporation.CorporationName)
@@ -52,7 +47,7 @@
                 @Html.DisplayFor(modelItem => item.Branch.BranchName)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.User.Role)
+                @Html.DisplayFor(modelItem => item.User.Username)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.CategoryId">Edit</a> |

@@ -1,29 +1,26 @@
-@model IEnumerable<DesktopApplication.Models.User>
-
+@model IEnumerable<DesktopApplication.Models.UserModel>
 @{
     ViewData["Title"] = "Index";
 }
 
 <h1>Index</h1>
+<div class="d-flex justify-content-between">
+    <a asp-action="Create">Create New User</a>
+    <a asp-controller="User" asp-action="Create">Create New Category</a>
+    <a asp-controller="Home" asp-action="Index">Back to Home</a>
+</div>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
 <table class="table">
     <thead>
         <tr>
             <th>
                 @Html.DisplayNameFor(model => model.Username)
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Role)
-            </th>
+           
             <th>
                 @Html.DisplayNameFor(model => model.CreatedDate)
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IsSync)
-            </th>
+            
             <th>
                 @Html.DisplayNameFor(model => model.Corporation)
             </th>
@@ -40,13 +37,7 @@
                 @Html.DisplayFor(modelItem => item.Username)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Role)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreatedDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IsSync)
+                @Html.DisplayFor(modelItem => item.CreatedOn)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Corporation.CorporationName)

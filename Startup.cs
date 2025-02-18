@@ -7,6 +7,8 @@ using Microsoft.Extensions.Hosting;
 using ElectronNET.API;
 using ElectronNET.API.Entities;
 using Microsoft.EntityFrameworkCore;
+using System.Data.Common;
+using DesktopApplication.Service;
 
 namespace DesktopApplication
 {
@@ -25,6 +27,8 @@ namespace DesktopApplication
             services.AddMvc();
             services.AddDbContext<ApplicationDbContext>(options =>
                    options.UseSqlite("Data Source=ElectronPoC.sqlite"));
+            DBConnections.
+            CreateDatabase();
         }
 
 
