@@ -18,6 +18,9 @@
                 @Html.DisplayNameFor(model => model.CategoryName)
             </th>
             <th>
+                @Html.DisplayNameFor(model => model.ParentCategoryName)
+            </th>
+            <th>
                 @Html.DisplayNameFor(model => model.CreatedDate)
             </th>
             <th>
@@ -33,33 +36,39 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.CategoryName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreatedOn)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Corporation.CorporationName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Branch.BranchName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.User.Username)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.CategoryId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.CategoryId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.CategoryId">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model) {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CategoryName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ParentCategoryName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CreatedOn)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Corporation.CorporationName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Branch.BranchName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.User.Username)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.CategoryId">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.CategoryId">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.CategoryId">Delete</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
-<div class="main">
-    <img src="~/assets/categoryhome.jpg" alt="Category Home"/>
+@if (Model == null && !Model.Any())
+{
+    <div class="main">
+        <img src="~/assets/categoryhome.jpg" alt="Category Home"/>
 
-</div>
+    </div>
+}

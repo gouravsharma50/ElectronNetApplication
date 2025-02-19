@@ -12,6 +12,8 @@ namespace DesktopApplication.Models
         public int CorporationId { get; set; }
         public int BranchId { get; set; }
         public int CreatedByUserId { get; set; }
+        public int? ParentCategoryId { get; set; }
+        public string? ParentCategoryName { get; set; }
 
         [Required]
         public string CategoryName { get; set; }

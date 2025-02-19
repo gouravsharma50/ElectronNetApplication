@@ -62,14 +62,7 @@ namespace DesktopApplication.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new User
-                {
-                    Username = corporationModel.CorporationName,
-                    Password = "123456",
-                    Role = "CORPORATION"
-                };
-
-                var createdUser = _businessService.CreateUser(user);
+               
                 var corporation = new Corporation
                 {
                     CorporationName = corporationModel.CorporationName,
@@ -78,6 +71,16 @@ namespace DesktopApplication.Controllers
 
                 _context.Add(corporation);
                 await _context.SaveChangesAsync();
+
+                var user = new User
+                {
+                    CorporationId = corporation.CorporationId,
+                    Username = corporationModel.CorporationName,
+                    Password = "123456",
+                    Role = "CORPORATION"
+                };
+
+                var createdUser = _businessService.CreateUser(user);
                 return RedirectToAction(nameof(Index));
             }
 

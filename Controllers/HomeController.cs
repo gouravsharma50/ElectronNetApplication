@@ -54,7 +54,7 @@ namespace DesktopApplication.Controllers
 
             var user = await _context.Users
                 .FirstOrDefaultAsync(u => u.Username == username && u.Password == password);
-
+          
             if (user == null)
             {
                 ViewBag.ErrorMessage = "Invalid username or password";

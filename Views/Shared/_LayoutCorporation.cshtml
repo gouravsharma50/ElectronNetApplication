@@ -35,6 +35,21 @@
                                 <a class="nav-link text-dark"  asp-controller="Branch" asp-action="Index">Branches</a>
                             </li>
                         }
+                        @if (userRole == "ADMIN")
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Corporation" asp-action="Index">Corporations</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Branch" asp-action="Index">Branches</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="User" asp-action="Index">Users</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Category" asp-action="Index">Categories</a>
+                            </li>
+                        }
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
