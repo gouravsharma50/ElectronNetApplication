@@ -8,6 +8,7 @@ using ElectronNET.API;
 using ElectronNET.API.Entities;
 using Microsoft.EntityFrameworkCore;
 using DesktopApplication.Service;
+using System;
 
 namespace DesktopApplication
 {
@@ -22,15 +23,21 @@ namespace DesktopApplication
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc();
-      
+            services.AddControllersWithViews()
+                .AddRazorRuntimeCompilation();
 
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlite("Data Source=ElectronPoC.sqlite"));
-           
+
             services.AddSingleton<DBConnections>();
-            // Register BusinessService
             services.AddScoped<BusinessService>();
+
+            // ✅ Enable Session
+            services.AddDistributedMemoryCache();
+            services.AddSession();
+           
+            // ✅ Register IHttpContextAccessor
+            services.AddHttpContextAccessor();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider serviceProvider)
@@ -42,6 +49,9 @@ namespace DesktopApplication
 
             app.UseStaticFiles();
             app.UseRouting();
+
+            // ✅ Use Session Middleware
+            app.UseSession();
 
             app.UseEndpoints(endpoints =>
             {
@@ -60,13 +70,8 @@ namespace DesktopApplication
         {
             using (var scope = serviceProvider.CreateScope())
             {
-
                 var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-
                 context.Database.Migrate();
-
-                // ✅ Call DBConnections to create additional tables if needed
-                //DBConnections.CreateDatabase();
             }
         }
 
@@ -80,7 +85,6 @@ namespace DesktopApplication
             });
 
             await browserWindow.WebContents.Session.ClearCacheAsync();
-
             browserWindow.OnReadyToShow += () => browserWindow.Show();
             browserWindow.SetTitle(Configuration["DemoTitleInSettings"]);
         }

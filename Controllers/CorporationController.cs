@@ -62,7 +62,7 @@ public class CorporationController : Controller
             {
                 Username = corporationModel.CorporationName,
                 Password = "123456",
-                Role = "Admin"
+                Role = "CORPORATION"
             };
 
             var createdUser = _businessService.CreateUser(user);

@@ -82,7 +82,7 @@ public class BranchController : Controller
             {
                 Username = branchModel.BranchName,
                 Password = "123456",
-                Role = "Branch"
+                Role = "BRANCH"
             };
 
             var createdUser = _businessService.CreateUser(user);

@@ -23,7 +23,8 @@
       "applicationUrl": "http://localhost:7066",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
-      }
+      },
+      "hotReloadEnabled": true // ✅ Enable Hot Reload
     },
     "https": {
       "commandName": "Project",
@@ -32,7 +33,8 @@
       "applicationUrl": "https://localhost:7066;http://localhost:5117",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
-      }
+      },
+      "hotReloadEnabled": true // ✅ Enable Hot Reload
     },
     "IIS Express": {
       "commandName": "IISExpress",

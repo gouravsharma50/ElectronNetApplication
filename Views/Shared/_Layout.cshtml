@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -8,14 +10,65 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/DesktopApplication.styles.css" asp-append-version="true" />
     <link href="~/css/stylemain.css" rel="stylesheet" />
+  <style>
+        .hero-section {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 80dvh;
+            border-radius: 15px;
+        }
+
+        .glass-container {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 400px;
+        }
+
+            .glass-container h1 {
+                margin-bottom: 20px;
+                font-size: 24px;
+                color: white;
+            }
+
+        .input-field {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            outline: none;
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .LoginBtn {
+            width: 100%;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.6);
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+            .LoginBtn:hover {
+                background: rgba(255, 255, 255, 0.8);
+            }
+  </style>
 </head>
 <body>
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">DesktopApplication</a>
+            <div class="container justify-content-center">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Welcome,<strong> @(HttpContextAccessor.HttpContext?.Session.GetString("UserName") ?? "Guest")</strong></a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+                aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
@@ -23,30 +76,71 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
-
-
-
-                        <li class="nav-item">
-                            @* <a class="nav-link text-dark"  asp-controller="Corporation" asp-action="Index">Corporations</a> *@
-                             <a class="nav-link text-dark" href="@Url.Action("Index", "Corporation")">Corporation</a>
-                        </li>
-                        <li class="nav-item">
-                            @* <a class="nav-link text-dark"  asp-controller="Branch" asp-action="Index">Branches</a> *@
-                            <a class="nav-link text-dark" href="@Url.Action("Index", "Branch")">Branch</a>
-                        </li>
-                        <li class="nav-item">
-                            @* <a class="nav-link text-dark" asp-controller="User" asp-action="Index">Users</a> *@
-                            <a class="nav-link text-dark" href="@Url.Action("Index", "User")">User</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" href="@Url.Action("Index", "Category")">Category</a>
-                            @* <a class="nav-link text-dark"  asp-controller="Category" asp-action="Index">Categories</a> *@
-                        </li>
-
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
-                       
+                       @*  For testing all menu *@
+                       @* 
+                           <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Corporation" asp-action="Index">Corporations</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Branch" asp-action="Index">Branches</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="User" asp-action="Index">Users</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Category" asp-action="Index">Categories</a>
+                        </li> *@
+                        @if (HttpContextAccessor.HttpContext?.Session.GetString("UserRole") == "ADMIN")
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Corporation" asp-action="Index">Corporations</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Branch" asp-action="Index">Branches</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="User" asp-action="Index">Users</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Category" asp-action="Index">Categories</a>
+                            </li>
+                        } 
+                        @if (HttpContextAccessor.HttpContext?.Session.GetString("UserRole") == "CORPORATION")
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Branch" asp-action="Index">Branches</a>
+                            </li>
+                        } 
+                        @if (HttpContextAccessor.HttpContext?.Session.GetString("UserRole") == "BRANCH")
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="User" asp-action="Index">Users</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Category" asp-action="Index">Categories</a>
+                            </li>
+                        }
+                        @if (HttpContextAccessor.HttpContext?.Session.GetString("UserRole") == "USER")
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Category" asp-action="Index">Categories</a>
+                            </li>
+                        }
+                        @if (HttpContextAccessor.HttpContext?.Session.GetString("UserName") != null)
+                        {
+                            <li class="nav-item flex-end">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Logout">Logout</a>
+                            </li>
+                        }
+                        @if (HttpContextAccessor.HttpContext?.Session.GetString("UserName") == null)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Login">Login</a>
+                            </li>
+                        }
                     </ul>
                 </div>
             </div>

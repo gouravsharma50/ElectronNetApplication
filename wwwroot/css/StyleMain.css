@@ -5,5 +5,9 @@
     background-repeat: no-repeat;
     height: 80dvh;
     width: 100%;
-    border-radius: 20px;
+    border-radius: 15px;
+}
+.btn{
+    margin-top:15px;
+    
 }
