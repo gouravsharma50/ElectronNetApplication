@@ -6,9 +6,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using DesktopApplication.Database;
 using DesktopApplication.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace DesktopApplication.Controllers
 {
+    [Authorize(Roles = "ADMIN, BRANCH")]
     public class UserController : Controller
     {
         private readonly ApplicationDbContext _context;

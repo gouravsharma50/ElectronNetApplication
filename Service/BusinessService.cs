@@ -1,7 +1,7 @@
 ﻿using DesktopApplication.Database;
 using DesktopApplication.Models;
 using Microsoft.EntityFrameworkCore;
-using System.Data.Entity;
+
 
 namespace DesktopApplication.Service
 {

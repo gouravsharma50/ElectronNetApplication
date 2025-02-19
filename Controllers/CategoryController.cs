@@ -5,9 +5,11 @@ using DesktopApplication.Models;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Authorization;
 
 namespace DesktopApplication.Controllers
 {
+    [Authorize(Roles = "ADMIN, BRANCH, USER")]
     public class CategoryController : Controller
     {
         private readonly ApplicationDbContext _context;

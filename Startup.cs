@@ -9,6 +9,7 @@ using ElectronNET.API.Entities;
 using Microsoft.EntityFrameworkCore;
 using DesktopApplication.Service;
 using System;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace DesktopApplication
 {
@@ -38,6 +39,20 @@ namespace DesktopApplication
            
             // ✅ Register IHttpContextAccessor
             services.AddHttpContextAccessor();
+            // ✅ Configure Authentication
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(options =>
+                {
+                    options.LoginPath = "/Home/Login";  // Redirect to Home Controller's Login action
+                    options.AccessDeniedPath = "/Home/AccessDenied"; // Redirect unauthorized users
+                    options.ExpireTimeSpan = TimeSpan.FromDays(7);// Keep user logged in for 7 days
+                });
+       
+            // ✅ Configure Authorization Policies
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
+            });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider serviceProvider)
@@ -52,7 +67,9 @@ namespace DesktopApplication
 
             // ✅ Use Session Middleware
             app.UseSession();
-
+            // ✅ Enable Authentication & Authorization Middleware
+            app.UseAuthentication();
+            app.UseAuthorization();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}");

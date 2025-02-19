@@ -1,12 +1,20 @@
 ﻿using System.Diagnostics;
+using System.Security.Claims;
 using DesktopApplication.Database;
 using DesktopApplication.Models;
 using DesktopApplication.Service;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.Scripting;
 using Microsoft.EntityFrameworkCore;
+
+
 
 namespace DesktopApplication.Controllers
 {
+    [AllowAnonymous]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -24,56 +32,75 @@ namespace DesktopApplication.Controllers
         {
             return View();
         }
+
+        public IActionResult AccessDenied()
+        {
+            return View();
+        }
+
         public IActionResult Login()
         {
             return View();
         }
+
         [HttpPost]
-        public async Task<IActionResult> Login(string userName, string password)
+        public async Task<IActionResult> Login(string username, string password)
         {
-            if (string.IsNullOrWhiteSpace(userName) || string.IsNullOrWhiteSpace(password))
+            if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
             {
-                ViewBag.Error = "Username and Password are required.";
+                ViewBag.ErrorMessage = "Username and Password are required.";
                 return View();
             }
 
             var user = await _context.Users
-                .Where(u => u.Username == userName && u.Password == password)
-                .Select(u => new { u.Username, u.Role })
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync(u => u.Username == username && u.Password == password);
 
             if (user == null)
             {
-                ViewBag.Error = "Invalid Username or Password.";
+                ViewBag.ErrorMessage = "Invalid username or password";
                 return View();
             }
 
-            // Store user details in session (optional)
-            HttpContext.Session.SetString("UserName", user.Username);
-            HttpContext.Session.SetString("UserRole", user.Role);
-            if (user.Role == "ADMIN")
-                return RedirectToAction("Index", "Corporation");
-            else if (user.Role == "CORPORATION")
-                return RedirectToAction("Index", "Branch");
-            else if (user.Role == "BRANCH")
-                return RedirectToAction("Index", "User");
-            else if (user.Role == "USER")
-                return RedirectToAction("Index", "Category");
-            else
-                return RedirectToAction("Index", "Category");
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, user.Username),
+                new Claim(ClaimTypes.Role, user.Role)
+            };
+
+            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            var authProperties = new AuthenticationProperties
+            {
+                IsPersistent = true,  // Keep user logged in even after browser closes
+                ExpiresUtc = DateTime.UtcNow.AddDays(7) // Set expiration to 7 days
+            };
+
+            await HttpContext.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                new ClaimsPrincipal(claimsIdentity),
+                authProperties);
+
+            return user.Role switch
+            {
+                "ADMIN" => RedirectToAction("Index", "Corporation"),
+                "CORPORATION" => RedirectToAction("Index", "Branch"),
+                "BRANCH" => RedirectToAction("Index", "User"),
+                "USER" => RedirectToAction("Index", "Category"),
+                _ => RedirectToAction("Index", "Category")
+            };
         }
+
         [HttpGet]
-        public IActionResult Logout()
+        public async Task<IActionResult> Logout()
         {
-            // ✅ Clear the session
-            HttpContext.Session.Clear();
-            return RedirectToAction("Login"); // Redirect back to login page
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            return RedirectToAction("Login");
         }
+
         public IActionResult Privacy()
         {
             return View();
-        } 
-        
+        }
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
