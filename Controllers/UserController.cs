@@ -97,40 +97,56 @@ namespace DesktopApplication.Controllers
         // GET: User/Create
         public IActionResult Create()
         {
-            ViewData["BranchId"] = new SelectList(_context.Branches, "BranchId", "BranchName");
-            ViewData["CorporationId"] = new SelectList(_context.Corporations, "CorporationId", "CorporationName");
+            var currentUserName = User.Identity.Name;
+
+            var currentUser = _context.Users
+                .Include(u => u.Corporation)
+                .Include(u => u.Branch)
+                .FirstOrDefault(u => u.Username == currentUserName);
+
+            if (currentUser == null)
+            {
+                return NotFound("User not found.");
+            }
+            
             return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("CorporationId,BranchId,Username")] UserModel userModel)
+        public async Task<IActionResult> Create( UserModel userModel)
         {
             if (ModelState.IsValid)
             {
-                // Mapping from UserModel to User
+                var currentUserName = User.Identity.Name;
+                var currentUser = _context.Users
+                    .Include(u => u.Corporation)
+                    .Include(u => u.Branch)
+                    .FirstOrDefault(u => u.Username == currentUserName);
+
+                if (currentUser == null)
+                {
+                    return NotFound("User not found.");
+                }
                 var user = new User
                 {
                     Password= userModel.Password,
-                    CorporationId = userModel.CorporationId,
-                    BranchId = userModel.BranchId,
+                    CorporationId = currentUser.CorporationId.HasValue ? currentUser.CorporationId.Value : 0,
+                    BranchId = currentUser.BranchId.HasValue ? currentUser.BranchId.Value : 0,
                     Username = userModel.Username,
-                    Role = "USER", // Default role
-                    CreatedDate = DateTime.UtcNow, // Default created date
-                    IsSync = false // Default IsSync value
+                    Role = "USER", 
+                    CreatedDate = DateTime.UtcNow, 
+                    IsSync = false 
                 };
 
                 _context.Add(user);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-
-            ViewData["BranchId"] = new SelectList(_context.Branches, "BranchId", "BranchName", userModel.BranchId);
-            ViewData["CorporationId"] = new SelectList(_context.Corporations, "CorporationId", "CorporationName", userModel.CorporationId);
+           
             return View(userModel);
         }
 
-        // GET: User/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)

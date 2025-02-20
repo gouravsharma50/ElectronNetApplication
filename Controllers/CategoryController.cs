@@ -132,8 +132,8 @@ namespace DesktopApplication.Controllers
             {
                 var category = new Category
                 {
-                    CorporationId = (int)currentUser.CorporationId,
-                    BranchId = (int)currentUser.BranchId,
+                    CorporationId = currentUser.CorporationId.HasValue ? currentUser.CorporationId.Value : 0,
+                    BranchId = currentUser.BranchId.HasValue ? currentUser.BranchId.Value : 0,
                     CreatedByUserId = currentUser.UserId,
                     CategoryName = model.CategoryName,
                     ParentCategoryId = model.ParentCategoryId,

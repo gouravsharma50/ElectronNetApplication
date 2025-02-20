@@ -62,7 +62,6 @@ namespace DesktopApplication.Controllers
         {
             if (ModelState.IsValid)
             {
-               
                 var corporation = new Corporation
                 {
                     CorporationName = corporationModel.CorporationName,

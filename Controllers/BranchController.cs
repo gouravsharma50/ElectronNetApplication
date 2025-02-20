@@ -9,7 +9,7 @@ using System.Linq;
 using System.Threading.Tasks;
 namespace DesktopApplication.Controllers
 {
-     [Authorize(Roles = "ADMIN, CORPORATION")]
+    [Authorize(Roles = "ADMIN, CORPORATION")]
     public class BranchController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -70,35 +70,48 @@ namespace DesktopApplication.Controllers
         // GET: Branch/Create
         public IActionResult Create()
         {
-            ViewData["CorporationId"] = new SelectList(_context.Corporations, "CorporationId", "CorporationName");
             return View();
         }
 
         // POST: Branch/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("BranchId,BranchName,CorporationId")] BranchModel branchModel)
+        public async Task<IActionResult> Create(BranchModel branchModel)
         {
             if (ModelState.IsValid)
             {
-                var user = new User
+                var currentUserName = User.Identity.Name;
+                var currentUser = _context.Users
+                    .Include(u => u.Corporation)
+                    .Include(u => u.Branch)
+                    .FirstOrDefault(u => u.Username == currentUserName);
+                if (currentUser == null)
                 {
-                    Username = branchModel.BranchName,
-                    Password = "123456",
-                    Role = "BRANCH"
-                };
-
-                var createdUser = _businessService.CreateUser(user);
+                    return NotFound("User not found.");
+                }
                 var branch = new Branch
                 {
                     BranchName = branchModel.BranchName,
-                    CorporationId = branchModel.CorporationId,
+                    CorporationId = currentUser.CorporationId.HasValue ? currentUser.CorporationId.Value :0,
                     BranchCreatedDate = DateTime.UtcNow,
                     IsSync = false
                 };
 
                 _context.Add(branch);
                 await _context.SaveChangesAsync();
+                var user = new User
+                {
+                    CorporationId = currentUser.CorporationId.HasValue ? currentUser.CorporationId.Value : 0,
+                    BranchId = branch.BranchId,
+                    Username = branchModel.BranchName,
+                    Password = "123456",
+                    Role = "BRANCH",
+                    CreatedDate = DateTime.UtcNow,
+                    IsSync = false
+                };
+
+                var createdUser = _businessService.CreateUser(user);
+              
                 return RedirectToAction(nameof(Index));
             }
 
