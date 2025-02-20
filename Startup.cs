@@ -27,9 +27,9 @@ namespace DesktopApplication
             services.AddControllersWithViews()
                 .AddRazorRuntimeCompilation();
 
+         
             services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlite("Data Source=ElectronPoC.sqlite"));
-
+            options.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
             services.AddSingleton<DBConnections>();
             services.AddScoped<BusinessService>();
 

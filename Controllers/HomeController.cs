@@ -51,20 +51,23 @@ namespace DesktopApplication.Controllers
                 ViewBag.ErrorMessage = "Username and Password are required.";
                 return View();
             }
-
             var user = await _context.Users
+                .Include(u => u.Corporation)
+                .Include(u => u.Branch)
                 .FirstOrDefaultAsync(u => u.Username == username && u.Password == password);
-          
             if (user == null)
             {
                 ViewBag.ErrorMessage = "Invalid username or password";
                 return View();
             }
-
+            var branch = user.Branch?.BranchName ?? ""; 
+            var corporation = user.Corporation?.CorporationName ?? "";
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, user.Username),
-                new Claim(ClaimTypes.Role, user.Role)
+                new Claim(ClaimTypes.Role, user.Role),
+                new Claim("Branch", branch),
+                new Claim("Corporation", corporation) 
             };
 
             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);

@@ -33,4 +33,11 @@
   <ItemGroup>
     <Folder Include="wwwroot\Assets\" />
   </ItemGroup>
+  <ItemGroup>
+    <None Update="ElectronPoC.sqlite">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+</ItemGroup>
+
+
 </Project>

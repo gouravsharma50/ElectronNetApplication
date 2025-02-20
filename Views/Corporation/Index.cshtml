@@ -42,10 +42,12 @@
 }
     </tbody>
 </table>
+@if (Model == null && !Model.Any())
+{
 <div class="main">
     <img src="~/assets/corporationhome.jpg" alt="Corporation home" />
 </div>
-
+}
 
 
 

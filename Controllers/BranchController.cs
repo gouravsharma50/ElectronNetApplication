@@ -9,7 +9,7 @@ using System.Linq;
 using System.Threading.Tasks;
 namespace DesktopApplication.Controllers
 {
-    [Authorize(Roles = "ADMIN, CORPORATION")]
+     [Authorize(Roles = "ADMIN, CORPORATION")]
     public class BranchController : Controller
     {
         private readonly ApplicationDbContext _context;

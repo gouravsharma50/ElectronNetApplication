@@ -10,7 +10,7 @@
   "build": {
     "appId": "com.DesktopApplication.app",
     "productName": "DesktopApplication",
-    "copyright": "Copyright © 2020",
+    "copyright": "Copyright © 2025",
     "buildVersion": "1.0.0",
     "compression": "maximum",
     "directories": {
@@ -18,16 +18,15 @@
     },
     "extraResources": [
       {
-        "from": "./bin",
-        "to": "bin",
-        "filter": [ "**/*" ]
+        "from": "./bin/Debug/net6.0/ElectronPoC.sqlite",
+        "to": "ElectronPoC.sqlite"
       }
     ],
     "files": [
       {
         "from": "./ElectronHostHook/node_modules",
         "to": "ElectronHostHook/node_modules",
-        "filter": [ "**/*" ]
+        "filter": ["**/*"]
       },
       "**/*"
     ]

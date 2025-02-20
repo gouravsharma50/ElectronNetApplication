@@ -48,6 +48,9 @@
         }
     </tbody>
 </table>
+@if (Model == null && !Model.Any())
+{
 <div class="main">
     <img src="~/assets/branchhome.jpg"  alt="branch home"/>
 </div>
+}

@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace DesktopApplication.Controllers
 {
-    [Authorize(Roles = "ADMIN, BRANCH")]
+     [Authorize(Roles = "ADMIN, BRANCH")]
     public class UserController : Controller
     {
         private readonly ApplicationDbContext _context;
